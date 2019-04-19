@@ -48,7 +48,8 @@ namespace Stryker.Core.Mutants
                     new CheckedMutator(),
                     new LinqMutator(),
                     new StringMutator(),
-                    new InterpolatedStringMutator()
+                    new InterpolatedStringMutator(),
+                    new BlockMutator()
                 };
             _mutants = new Collection<Mutant>();
             _logger = ApplicationLogging.LoggerFactory.CreateLogger<MutantOrchestrator>();
@@ -76,6 +77,10 @@ namespace Stryker.Core.Mutants
             if (!CanBeMutated(currentNode))
             {
                 return currentNode;
+            }
+            if (currentNode is BlockSyntax block)
+            {
+                return MutateBlock(block);
             }
             // apply statement specific strategies (where applicable)
             if (currentNode is ExpressionStatementSyntax tentativeAssignment)
@@ -151,6 +156,22 @@ namespace Stryker.Core.Mutants
             }
 
             return MutateExpressions(expressionStatement);
+        }
+
+        private SyntaxNode MutateBlock(BlockSyntax block)
+        {
+            var trackedNodes = block.TrackNodes(block.ChildNodes().Append(block));
+            foreach(var childNode in block.ChildNodes())
+            {
+                trackedNodes = trackedNodes.ReplaceNode(trackedNodes.GetCurrentNode(childNode), Mutate(childNode));
+            }
+            foreach (var mutant in FindMutants(block))
+            {
+                _mutants.Add(mutant);
+                var mutatedNode = ApplyMutant(trackedNodes.GetCurrentNode(block), mutant);
+                //trackedNodes = MutantPlacer.PlaceWithIfStatement(trackedNodes, mutatedNode, mutant.Id);
+            }
+            return trackedNodes;
         }
 
         private SyntaxNode MutateIfStatement(IfStatementSyntax ifStatement)

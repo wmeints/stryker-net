@@ -3,7 +3,6 @@ using Stryker.Core.Exceptions;
 using Stryker.Core.Logging;
 using Stryker.Core.Testing;
 using Stryker.Core.ToolHelpers;
-using System;
 using System.IO;
 
 namespace Stryker.Core.Initialisation
