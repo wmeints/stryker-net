@@ -19,7 +19,7 @@ namespace Stryker.Core.ProjectComponents
         }
 
         public override IEnumerable<SyntaxTree> CompilationSyntaxTrees => new List<SyntaxTree> { SyntaxTree };
-        public override IEnumerable<SyntaxTree> MutationSyntaxTrees => new List<SyntaxTree> { MutatedSyntaxTree };
+        public override IEnumerable<SyntaxTree> MutatedSyntaxTrees => new List<SyntaxTree> { MutatedSyntaxTree };
 
         public override void Display(int depth)
         {
